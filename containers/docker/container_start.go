@@ -5,35 +5,36 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/docker/go-connections/nat"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/api/types"
+	"github.com/docker/go-connections/nat"
+	"github.com/openconfig/containerz/containers"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"github.com/openconfig/containerz/containers"
 )
 
 // ContainerStart starts a container provided the image exists and that the ports requested are not
 // currently in use.
 // TODO(alshabib) consider adding restart policy to containerz proto
-func (m *Manager) ContainerStart(ctx context.Context, image, tag, cmd string, opts ...options.Option) (string, error) {
+func (m *Manager) ContainerStart(ctx context.Context, img, tag, cmd string, opts ...options.Option) (string, error) {
 	optionz := options.ApplyOptions(opts...)
 
-	images, err := m.client.ImageList(ctx, types.ImageListOptions{
+	images, err := m.client.ImageList(ctx, image.ListOptions{
 		// TODO(alshabib): consider filtering for the image we care about
 	})
 	if err != nil {
 		return "", err
 	}
 
-	ref := fmt.Sprintf("%s:%s", image, tag)
+	ref := fmt.Sprintf("%s:%s", img, tag)
 	if err := findImage(ref, images); err != nil {
 		return "", err
 	}
 
-	cnts, err := m.client.ContainerList(ctx, types.ContainerListOptions{
+	cnts, err := m.client.ContainerList(ctx, container.ListOptions{
 		// TODO(alshabib): consider filtering for the image we care about
 	})
 	if err != nil {
@@ -108,7 +109,7 @@ func (m *Manager) ContainerStart(ctx context.Context, image, tag, cmd string, op
 		return "", status.Errorf(codes.Internal, "unable to create container: %v", err)
 	}
 
-	if err := m.client.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+	if err := m.client.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
 		return "", status.Errorf(codes.Internal, "unable to start container: %v", err)
 	}
 

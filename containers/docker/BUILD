@@ -7,6 +7,7 @@ go_library(
         "container_logs.go",
         "container_start.go",
         "container_stop.go",
+        "image_list.go",
         "image_pull.go",
         "image_push.go",
         "image_remove.go",
@@ -16,6 +17,7 @@ go_library(
         "volume_list.go",
         "volume_remove.go",
     ],
+    deps = ["//third_party/openconfig/containerz/containers:options"],
 )
 
 go_test(
@@ -26,6 +28,7 @@ go_test(
         "container_logs_test.go",
         "container_start_test.go",
         "container_stop_test.go",
+        "image_list_test.go",
         "image_pull_test.go",
         "image_push_test.go",
         "image_remove_test.go",
@@ -36,4 +39,5 @@ go_test(
         "volume_remove_test.go",
     ],
     library = ":docker",
+    deps = ["//third_party/openconfig/containerz/containers:options"],
 )

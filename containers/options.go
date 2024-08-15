@@ -18,9 +18,9 @@ package options
 import (
 	"time"
 
-	"google.golang.org/protobuf/proto"
 	cpb "github.com/openconfig/gnoi/containerz"
 	tpb "github.com/openconfig/gnoi/types"
+	"google.golang.org/protobuf/proto"
 )
 
 // Stream represents an entity capable of sending responses to the client.
@@ -36,6 +36,11 @@ type LogStreamer interface {
 // ListContainerStreamer is an entity capable of streaming container information.
 type ListContainerStreamer interface {
 	Send(msg *cpb.ListContainerResponse) error
+}
+
+// ListImageStreamer is an entity capable of streaming container information.
+type ListImageStreamer interface {
+	Send(msg *cpb.ListImageResponse) error
 }
 
 // ListVolumeStreamer is an entity capable of streaming volume information.

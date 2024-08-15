@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/docker/docker/api/types"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/docker/docker/api/types/container"
 	"github.com/openconfig/containerz/containers"
 	cpb "github.com/openconfig/gnoi/containerz"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // ContainerLogs fetches the logs from a container. It can optionally follow the logs
@@ -17,7 +17,7 @@ import (
 func (m *Manager) ContainerLogs(ctx context.Context, instance string, srv options.LogStreamer, opts ...options.Option) error {
 	optionz := options.ApplyOptions(opts...)
 
-	cnts, err := m.client.ContainerList(ctx, types.ContainerListOptions{
+	cnts, err := m.client.ContainerList(ctx, container.ListOptions{
 		// TODO(alshabib): consider filtering for the image we care about
 	})
 	if err != nil {
@@ -28,7 +28,7 @@ func (m *Manager) ContainerLogs(ctx context.Context, instance string, srv option
 		return status.Errorf(codes.NotFound, "container %s not found", instance)
 	}
 
-	logOpts := types.ContainerLogsOptions{
+	logOpts := container.LogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
 	}

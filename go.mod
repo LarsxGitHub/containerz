@@ -4,11 +4,11 @@ go 1.21
 
 require (
 	github.com/briandowns/spinner v1.23.0
-	github.com/docker/docker v26.1.4+incompatible
+	github.com/docker/docker v27.1.2+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/google/go-cmp v0.6.0
 	github.com/moby/moby v24.0.9+incompatible
-	github.com/openconfig/gnoi v0.4.1-0.20240501161656-1d16819bab6a
+	github.com/openconfig/gnoi v0.5.0
 	github.com/opencontainers/image-spec v1.1.0
 	github.com/spf13/cobra v1.8.0
 	golang.org/x/sys v0.21.0

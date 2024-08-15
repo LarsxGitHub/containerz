@@ -5,11 +5,10 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types"
+	"github.com/openconfig/containerz/containers"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"k8s.io/klog/v2"
-	"github.com/openconfig/containerz/containers"
 )
 
 // ContainerStop stops a container. If the Force option is set and a timeout
@@ -20,7 +19,7 @@ import (
 func (m *Manager) ContainerStop(ctx context.Context, instance string, opts ...options.Option) error {
 	optionz := options.ApplyOptions(opts...)
 
-	cnts, err := m.client.ContainerList(ctx, types.ContainerListOptions{
+	cnts, err := m.client.ContainerList(ctx, container.ListOptions{
 		// TODO(alshabib): consider filtering for the image we care about
 	})
 	if err != nil {
@@ -53,7 +52,7 @@ func (m *Manager) ContainerStop(ctx context.Context, instance string, opts ...op
 		klog.Warningf("container %s was not running", instance)
 	}
 
-	if err := m.client.ContainerRemove(ctx, instance, types.ContainerRemoveOptions{
+	if err := m.client.ContainerRemove(ctx, instance, container.RemoveOptions{
 		Force: optionz.Force,
 	}); err != nil {
 		return err

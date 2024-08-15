@@ -6,29 +6,31 @@ import (
 	"fmt"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
+	"github.com/openconfig/containerz/containers"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"github.com/openconfig/containerz/containers"
 )
 
 // ContainerRemove removes an image provided it is not related to a running container. Otherwise,
 // it returns an error.
-func (m *Manager) ContainerRemove(ctx context.Context, image, tag string, opts ...options.Option) error {
+func (m *Manager) ContainerRemove(ctx context.Context, img, tag string, opts ...options.Option) error {
 	option := options.ApplyOptions(opts...)
 
-	images, err := m.client.ImageList(ctx, types.ImageListOptions{
+	images, err := m.client.ImageList(ctx, image.ListOptions{
 		// TODO(alshabib): consider filtering for the image we care about
 	})
 	if err != nil {
 		return err
 	}
 
-	ref := fmt.Sprintf("%s:%s", image, tag)
+	ref := fmt.Sprintf("%s:%s", img, tag)
 	if err := findImage(ref, images); err != nil {
 		return err
 	}
 
-	cnts, err := m.client.ContainerList(ctx, types.ContainerListOptions{
+	cnts, err := m.client.ContainerList(ctx, container.ListOptions{
 		// TODO(alshabib): consider filtering for the image we care about
 	})
 	if err != nil {
@@ -38,7 +40,7 @@ func (m *Manager) ContainerRemove(ctx context.Context, image, tag string, opts .
 	state := findImageFromContainer(ref, cnts)
 	if state != nil {
 		if option.Force {
-			_, err := m.client.ImageRemove(ctx, ref, types.ImageRemoveOptions{
+			_, err := m.client.ImageRemove(ctx, ref, image.RemoveOptions{
 				Force: option.Force,
 			})
 			return err
@@ -46,7 +48,7 @@ func (m *Manager) ContainerRemove(ctx context.Context, image, tag string, opts .
 		return state.Err()
 	}
 
-	_, err = m.client.ImageRemove(ctx, ref, types.ImageRemoveOptions{})
+	_, err = m.client.ImageRemove(ctx, ref, image.RemoveOptions{})
 	return err
 }
 
@@ -59,7 +61,7 @@ func findImageFromContainer(ref string, cnt []types.Container) *status.Status {
 	return nil
 }
 
-func findImage(ref string, summaries []types.ImageSummary) error {
+func findImage(ref string, summaries []image.Summary) error {
 	for _, summary := range summaries {
 		for _, name := range summary.RepoTags {
 			if ref == name {

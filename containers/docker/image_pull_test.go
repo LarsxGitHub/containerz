@@ -7,16 +7,16 @@ import (
 	"io"
 	"testing"
 
+	"github.com/docker/docker/api/types/image"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/docker/docker/api/types"
 	"github.com/moby/moby/pkg/jsonmessage"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/testing/protocmp"
 	"github.com/openconfig/containerz/containers"
 	cpb "github.com/openconfig/gnoi/containerz"
 	tpb "github.com/openconfig/gnoi/types"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
 type fakePullingDocker struct {
@@ -26,7 +26,7 @@ type fakePullingDocker struct {
 	TargetRef string
 }
 
-func (f *fakePullingDocker) ImagePull(ctx context.Context, ref string, options types.ImagePullOptions) (io.ReadCloser, error) {
+func (f *fakePullingDocker) ImagePull(ctx context.Context, ref string, options image.PullOptions) (io.ReadCloser, error) {
 	f.ImageRef = ref
 	jm := &jsonmessage.JSONMessage{
 		Progress: &jsonmessage.JSONProgress{
