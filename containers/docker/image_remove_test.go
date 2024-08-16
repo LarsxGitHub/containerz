@@ -35,7 +35,7 @@ func (f *fakeRemovingDocker) ImageRemove(ctx context.Context, image string, opti
 	return nil, nil
 }
 
-func TestContainerRemove(t *testing.T) {
+func TestImageRemove(t *testing.T) {
 	tests := []struct {
 		name        string
 		inOpts      []options.Option
@@ -88,16 +88,16 @@ func TestContainerRemove(t *testing.T) {
 			},
 		},
 		{
-			name:    "container-remove",
-			inImage: "container-remove",
+			name:    "image-remove",
+			inImage: "image-remove",
 			inTag:   "remove-tag",
 			inSummaries: []image.Summary{
 				image.Summary{
-					RepoTags: []string{"container-remove:remove-tag"},
+					RepoTags: []string{"image-remove:remove-tag"},
 				},
 			},
 			wantState: &fakeRemovingDocker{
-				Name: "container-remove:remove-tag",
+				Name: "image-remove:remove-tag",
 			},
 		},
 	}
@@ -110,19 +110,19 @@ func TestContainerRemove(t *testing.T) {
 			}
 			mgr := New(fpd)
 
-			if err := mgr.ContainerRemove(context.Background(), tc.inImage, tc.inTag, tc.inOpts...); err != nil {
+			if err := mgr.ImageRemove(context.Background(), tc.inImage, tc.inTag, tc.inOpts...); err != nil {
 				if tc.wantErr != nil {
 					if diff := cmp.Diff(tc.wantErr, err, cmpopts.EquateErrors()); diff != "" {
-						t.Errorf("ContainerRemove(%q, %q, %+v) returned unexpected error(-want, got):\n %s", tc.inImage, tc.inTag, tc.inOpts, diff)
+						t.Errorf("ImageRemove(%q, %q, %+v) returned unexpected error(-want, got):\n %s", tc.inImage, tc.inTag, tc.inOpts, diff)
 					}
 					return
 				}
-				t.Errorf("ContainerRemove(%q, %q, %+v) returned error: %v", tc.inImage, tc.inTag, tc.inOpts, err)
+				t.Errorf("ImageRemove(%q, %q, %+v) returned error: %v", tc.inImage, tc.inTag, tc.inOpts, err)
 			}
 
 			if tc.wantState != nil {
 				if diff := cmp.Diff(tc.wantState, fpd, cmpopts.IgnoreUnexported(fakeRemovingDocker{})); diff != "" {
-					t.Errorf("ContainerRemove(%q, %q, %+v) returned diff(-want, +got):\n%s", tc.inImage, tc.inTag, tc.inOpts, diff)
+					t.Errorf("ImageRemove(%q, %q, %+v) returned diff(-want, +got):\n%s", tc.inImage, tc.inTag, tc.inOpts, diff)
 				}
 			}
 		})

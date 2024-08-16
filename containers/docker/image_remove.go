@@ -13,9 +13,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// ContainerRemove removes an image provided it is not related to a running container. Otherwise,
+// ImageRemove removes an image provided it is not related to a running container. Otherwise,
 // it returns an error.
-func (m *Manager) ContainerRemove(ctx context.Context, img, tag string, opts ...options.Option) error {
+func (m *Manager) ImageRemove(ctx context.Context, img, tag string, opts ...options.Option) error {
 	option := options.ApplyOptions(opts...)
 
 	images, err := m.client.ImageList(ctx, image.ListOptions{
@@ -50,6 +50,15 @@ func (m *Manager) ContainerRemove(ctx context.Context, img, tag string, opts ...
 
 	_, err = m.client.ImageRemove(ctx, ref, image.RemoveOptions{})
 	return err
+}
+
+
+// ContainerRemove removes an image provided it is not related to a running container. Otherwise,
+// it returns an error.
+//
+// Deprecated - use ImageRemove instead.
+func (m *Manager) ContainerRemove(ctx context.Context, img, tag string, opts ...options.Option) error {
+	return m.ImageRemove(ctx, img, tag, opts...)
 }
 
 func findImageFromContainer(ref string, cnt []types.Container) *status.Status {
